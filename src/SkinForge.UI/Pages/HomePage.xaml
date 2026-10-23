@@ -1,0 +1,26 @@
+<UserControl x:Class="SkinForge.UI.Pages.HomePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:SkinForge.UI.Controls" xmlns:loc="clr-namespace:SkinForge.UI.Localization">
+ <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="36,32,36,36">
+  <Grid Margin="0,0,0,28"><Grid.ColumnDefinitions><ColumnDefinition Width="0.9*"/><ColumnDefinition Width="1.1*"/></Grid.ColumnDefinitions>
+   <StackPanel VerticalAlignment="Center" Margin="0,0,28,0">
+    <TextBlock Text="{loc:T studio_eyebrow}" Foreground="{DynamicResource AccentBrush}" FontSize="10" FontWeight="SemiBold" Margin="0,0,0,20"/>
+    <TextBlock Text="{loc:T studio_title}" TextWrapping="Wrap" FontFamily="{StaticResource FontDisplay}" FontSize="46" FontWeight="SemiBold" LineHeight="54" Foreground="#F3F3E9"/>
+    <TextBlock Text="{loc:T studio_desc}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="23" Margin="0,18,0,24" MaxWidth="370" HorizontalAlignment="Left"/>
+    <WrapPanel><Button Style="{StaticResource Btn.Primary}" Content="{loc:T nav_champions}" Command="{Binding Shell.NavigateCommand}" CommandParameter="champions" Margin="0,0,8,8"/><Button Style="{StaticResource Btn.Secondary}" Content="{loc:T studio_surprise}" Command="{Binding SurpriseCommand}" Margin="0,0,0,8"/></WrapPanel>
+    <TextBlock Text="{loc:T app_free_caption}" Foreground="{StaticResource TextMutedBrush}" FontSize="11" Margin="0,14,0,0"/>
+   </StackPanel>
+   <Border Grid.Column="1" Height="390" Background="#20353B" CornerRadius="22" ClipToBounds="True">
+    <Grid><c:RemoteArtwork Url="{Binding Slide.ImageUrl}" KeepPrevious="True" FocusX="0.65" FocusY="0.27"/>
+     <Border VerticalAlignment="Bottom" Height="180"><Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#00121F25"/><GradientStop Color="#F5121F25" Offset="1"/></LinearGradientBrush></Border.Background></Border>
+     <Border Background="#D0122025" Padding="12,6" CornerRadius="14" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20"><TextBlock Text="{loc:T hero_pill}" Foreground="#D6EBD3" FontSize="10"/></Border>
+     <Grid VerticalAlignment="Bottom" Margin="24"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{Binding Slide.ChampionName}" Foreground="#C6D9D4" FontSize="11"/><TextBlock Text="{Binding Slide.Title}" FontSize="24" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" Margin="0,6,10,0"/></StackPanel><Button Grid.Column="1" Style="{StaticResource Btn.Overlay}" Command="{Binding OpenSlideCommand}" Content="→" VerticalAlignment="Bottom" AutomationProperties.Name="View skin"/></Grid>
+    </Grid>
+   </Border>
+  </Grid>
+  <Grid Margin="0,0,0,30"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="18"/><ColumnDefinition/></Grid.ColumnDefinitions>
+   <Button Style="{StaticResource Btn.Bare}" Command="{Binding ImportCommand}"><Border Background="#1A2B31" CornerRadius="14" Padding="22"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{loc:T studio_import}" FontSize="17" FontWeight="SemiBold" Foreground="#F3F3E9"/><TextBlock Text="{loc:T studio_import_desc}" Foreground="{StaticResource TextMutedBrush}" Margin="0,7,0,0" TextWrapping="Wrap"/></StackPanel><c:Icon Grid.Column="1" Data="{StaticResource Icon.Plus}" Width="20" Height="20" Foreground="{DynamicResource AccentBrush}" Margin="16,0,0,0"/></Grid></Border></Button>
+   <Button Grid.Column="2" Style="{StaticResource Btn.Bare}" Command="{Binding CompareCommand}"><Border Background="#1A2B31" CornerRadius="14" Padding="22"><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="{loc:T studio_compare}" FontSize="17" FontWeight="SemiBold" Foreground="#F3F3E9"/><TextBlock Text="{loc:T studio_compare_desc}" Foreground="{StaticResource TextMutedBrush}" Margin="0,7,0,0" TextWrapping="Wrap"/></StackPanel><TextBlock Grid.Column="1" Text="↔" FontSize="24" Foreground="{DynamicResource AccentBrush}" Margin="16,0,0,0" VerticalAlignment="Center"/></Grid></Border></Button>
+  </Grid>
+  <Grid Margin="0,0,0,18"><TextBlock Text="{loc:T studio_picks}" FontSize="22" FontWeight="SemiBold"/><Button Style="{StaticResource Btn.Ghost.Sm}" Command="{Binding ExploreCommand}" Content="{loc:T nav_discover}" HorizontalAlignment="Right"/></Grid>
+  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" c:Scroll.ForwardWheel="True"><ItemsControl ItemsSource="{Binding Picks}" ItemTemplate="{StaticResource PortraitCard}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemContainerStyle><Style TargetType="ContentPresenter"><Setter Property="Width" Value="176"/><Setter Property="Height" Value="265"/><Setter Property="Margin" Value="0,0,16,12"/></Style></ItemsControl.ItemContainerStyle></ItemsControl></ScrollViewer>
+ </StackPanel></ScrollViewer>
+</UserControl>

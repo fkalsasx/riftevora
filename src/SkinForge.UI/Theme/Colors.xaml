@@ -1,0 +1,104 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- SKINFORGE DESIGN TOKENS — 80% charcoal neutral, 15% surfaces, 5% accent. Ported 1:1 from prototype/index.html. -->
+
+    <!-- Accent: replaced at runtime by AccentThemes (Hextech Gold / Piltover Cyan) -->
+    <Color x:Key="AccentColor">#C8AA6E</Color>
+    <Color x:Key="AccentHoverColor">#DFBA73</Color>
+    <Color x:Key="AccentPressedColor">#A98748</Color>
+    <Color x:Key="AccentSubtleColor">#1FC8AA6E</Color>
+    <Color x:Key="AccentBorderColor">#4DC8AA6E</Color>
+    <Color x:Key="AccentGlowColor">#38C8AA6E</Color>
+
+    <!-- Neutral surfaces -->
+    <Color x:Key="BgCanvasColor">#0D1519</Color>
+    <Color x:Key="BgSubtleColor">#101B20</Color>
+    <Color x:Key="BgSurfaceColor">#101C21</Color>
+    <Color x:Key="BgCardColor">#18272D</Color>
+    <Color x:Key="BgCardHoverColor">#20343B</Color>
+    <Color x:Key="BgInputColor">#111F25</Color>
+    <Color x:Key="BgModalColor">#14252B</Color>
+    <Color x:Key="BgDrawerColor">#132228</Color>
+    <Color x:Key="BgActiveNavColor">#161B23</Color>
+    <Color x:Key="BorderSubtleColor">#12FFFFFF</Color>
+    <Color x:Key="BorderBrightColor">#24FFFFFF</Color>
+    <Color x:Key="HoverWashColor">#0AFFFFFF</Color>
+
+    <!-- Semantic status colors: used only when they carry meaning -->
+    <Color x:Key="SuccessColor">#10B981</Color>
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="DangerColor">#EF4444</Color>
+    <Color x:Key="InfoColor">#38BDF8</Color>
+
+    <!-- Text -->
+    <Color x:Key="TextPrimaryColor">#F3F3E9</Color>
+    <Color x:Key="TextSecondaryColor">#A9BABF</Color>
+    <Color x:Key="TextMutedColor">#81979E</Color>
+    <Color x:Key="TextDisabledColor">#475569</Color>
+
+    <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentColor}"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="{DynamicResource AccentHoverColor}"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="{DynamicResource AccentPressedColor}"/>
+    <SolidColorBrush x:Key="AccentSubtleBrush" Color="{DynamicResource AccentSubtleColor}"/>
+    <SolidColorBrush x:Key="AccentBorderBrush" Color="{DynamicResource AccentBorderColor}"/>
+
+    <SolidColorBrush x:Key="BgCanvasBrush" Color="{StaticResource BgCanvasColor}"/>
+    <SolidColorBrush x:Key="BgSubtleBrush" Color="{StaticResource BgSubtleColor}"/>
+    <SolidColorBrush x:Key="BgSurfaceBrush" Color="{StaticResource BgSurfaceColor}"/>
+    <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCardColor}"/>
+    <SolidColorBrush x:Key="BgCardHoverBrush" Color="{StaticResource BgCardHoverColor}"/>
+    <SolidColorBrush x:Key="BgInputBrush" Color="{StaticResource BgInputColor}"/>
+    <SolidColorBrush x:Key="BgModalBrush" Color="{StaticResource BgModalColor}"/>
+    <SolidColorBrush x:Key="BgDrawerBrush" Color="{StaticResource BgDrawerColor}"/>
+    <SolidColorBrush x:Key="BgActiveNavBrush" Color="{StaticResource BgActiveNavColor}"/>
+    <SolidColorBrush x:Key="ScrimBrush" Color="#B8070A0E"/>
+    <SolidColorBrush x:Key="BorderSubtleBrush" Color="{StaticResource BorderSubtleColor}"/>
+    <SolidColorBrush x:Key="BorderBrightBrush" Color="{StaticResource BorderBrightColor}"/>
+
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="SuccessSubtleBrush" Color="#2410B981"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="WarningSubtleBrush" Color="#24F59E0B"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
+    <SolidColorBrush x:Key="DangerSubtleBrush" Color="#24EF4444"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}"/>
+    <SolidColorBrush x:Key="InfoSubtleBrush" Color="#2438BDF8"/>
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMutedColor}"/>
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource TextDisabledColor}"/>
+
+    <!-- Artwork scrims -->
+    <LinearGradientBrush x:Key="CardArtScrim" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#00151A21" Offset="0.45"/>
+        <GradientStop Color="#F2151A21" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="HeroScrim" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#F50B0D10" Offset="0"/>
+        <GradientStop Color="#C20B0D10" Offset="0.5"/>
+        <GradientStop Color="#400B0D10" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="HeroBottomScrim" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#000B0D10" Offset="0.55"/>
+        <GradientStop Color="#990B0D10" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ShimmerBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#141A22" Offset="0"/>
+        <GradientStop Color="#1B232D" Offset="0.5"/>
+        <GradientStop Color="#141A22" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Metrics -->
+    <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">8</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">12</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">16</CornerRadius>
+
+    <FontFamily x:Key="FontMain">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontMono">Cascadia Mono, Consolas</FontFamily>
+
+    <DropShadowEffect x:Key="ShadowLifted" BlurRadius="28" ShadowDepth="10" Direction="270" Opacity="0.55" Color="Black"/>
+    <DropShadowEffect x:Key="ShadowModal" BlurRadius="60" ShadowDepth="20" Direction="270" Opacity="0.7" Color="Black"/>
+</ResourceDictionary>

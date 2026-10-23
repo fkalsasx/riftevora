@@ -1,0 +1,108 @@
+<UserControl x:Class="SkinForge.UI.Pages.ChampionsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:SkinForge.UI.Controls"
+             xmlns:loc="clr-namespace:SkinForge.UI.Localization">
+    <UserControl.Resources>
+        <Style x:Key="LetterButton" TargetType="Button">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="FontFamily" Value="{StaticResource FontMono}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" CornerRadius="4" Background="Transparent" Margin="1,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentBrush}"/><Setter Property="Foreground" Value="#0B0D10"/></Trigger>
+                            <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource TextDisabledBrush}"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+
+        <StackPanel Margin="32,26,32,10">
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource Text.Page}"/>
+                    <TextBlock Style="{StaticResource Text.Sub}" Margin="0,3,0,0"><Run Text="{Binding CountText, Mode=OneWay}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/><Run Text="  ·  "/><Run Text="{Binding Subtitle, Mode=OneWay}"/></TextBlock>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <c:SearchBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" c:Ui.Hint="{loc:T champions_search}" Width="280" Margin="0,0,12,0" x:Name="PageSearch"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Margin="0,0,6,0" IsChecked="{Binding Mode, Converter={x:Static c:Conv.Eq}, ConverterParameter=cards, Mode=TwoWay}" ToolTip="{loc:T view_cards}" GroupName="ChampView" Padding="10,8">
+                        <c:Icon Data="{StaticResource Icon.Grid}" Width="15" Height="15"/>
+                    </RadioButton>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Margin="0" IsChecked="{Binding Mode, Converter={x:Static c:Conv.Eq}, ConverterParameter=table, Mode=TwoWay}" ToolTip="{loc:T view_table}" GroupName="ChampView" Padding="10,8">
+                        <c:Icon Data="{StaticResource Icon.List}" Width="15" Height="15"/>
+                    </RadioButton>
+                </StackPanel>
+            </Grid>
+
+            <Border Background="{StaticResource BgSurfaceBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="6,4" Margin="0,0,0,14"
+                    Visibility="{Binding Letters.Count, Converter={x:Static c:Conv.NonZeroVisible}}">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" c:Scroll.ForwardWheel="True" Focusable="False">
+                    <ItemsControl ItemsSource="{Binding Letters}">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource LetterButton}" Content="{Binding Letter}" IsEnabled="{Binding IsEnabled}"
+                                        Command="{Binding DataContext.JumpCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <WrapPanel>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_all}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=all, Mode=TwoWay}" GroupName="ChampRole"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_assassin}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=Assassin, Mode=TwoWay}" GroupName="ChampRole"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_fighter}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=Fighter, Mode=TwoWay}" GroupName="ChampRole"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_mage}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=Mage, Mode=TwoWay}" GroupName="ChampRole"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_marksman}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=Marksman, Mode=TwoWay}" GroupName="ChampRole"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_support}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=Support, Mode=TwoWay}" GroupName="ChampRole"/>
+                    <RadioButton Style="{StaticResource Chip.Radio}" Content="{loc:T role_tank}" IsChecked="{Binding Role, Converter={x:Static c:Conv.Eq}, ConverterParameter=Tank, Mode=TwoWay}" GroupName="ChampRole"/>
+                </WrapPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                    <TextBlock Text="{loc:T sort_by}" Style="{StaticResource Text.Small}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <ComboBox Style="{StaticResource Select}" MinWidth="170" ItemsSource="{Binding SortOptions}" DisplayMemberPath="Label" SelectedValuePath="Key" SelectedValue="{Binding Sort}"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- table header -->
+            <Grid Margin="45,10,89,4" Visibility="{Binding IsTable, Converter={x:Static c:Conv.Vis}}">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="48"/><ColumnDefinition Width="1.2*"/><ColumnDefinition Width="1.6*"/><ColumnDefinition Width="110"/><ColumnDefinition Width="90"/></Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1" Text="{loc:T col_champion, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                <TextBlock Grid.Column="2" Text="{loc:T col_title, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                <TextBlock Grid.Column="3" Text="{loc:T col_role, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                <TextBlock Grid.Column="4" Text="{loc:T col_skins, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10" HorizontalAlignment="Right"/>
+            </Grid>
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <ItemsControl x:Name="CardGrid" Style="{StaticResource CardGrid}" ItemsSource="{Binding Items}" Visibility="{Binding IsTable, Converter={x:Static c:Conv.InvVis}}"/>
+            <ItemsControl x:Name="TableGrid" Style="{StaticResource CardGrid}" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource ChampionRow}" ItemTemplateSelector="{x:Null}"
+                          Visibility="{Binding IsTable, Converter={x:Static c:Conv.Vis}}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:VirtualGridPanel MinItemWidth="2000" FixedHeight="56" Gap="6"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding IsEmpty, Converter={x:Static c:Conv.Vis}}" Margin="0,0,0,80">
+                <c:Icon Data="{StaticResource Icon.Search}" Width="38" Height="38" StrokeThickness="1.3" Foreground="{StaticResource TextDisabledBrush}" HorizontalAlignment="Center"/>
+                <TextBlock Text="{loc:T empty_no_results}" Style="{StaticResource Text.Section}" HorizontalAlignment="Center" Margin="0,14,0,4"/>
+                <TextBlock Text="{loc:T empty_no_results_sub}" Style="{StaticResource Text.Sub}" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

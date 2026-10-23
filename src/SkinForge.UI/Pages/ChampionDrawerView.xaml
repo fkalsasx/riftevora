@@ -1,0 +1,151 @@
+<UserControl x:Class="SkinForge.UI.Pages.ChampionDrawerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:SkinForge.UI.Controls"
+             xmlns:loc="clr-namespace:SkinForge.UI.Localization"
+             xmlns:vm="clr-namespace:SkinForge.UI.ViewModels">
+    <UserControl.Resources>
+        <Style x:Key="MiniSkin" TargetType="Button" BasedOn="{StaticResource Btn.Bare}">
+            <Setter Property="Width" Value="112"/>
+            <Setter Property="Height" Value="156"/>
+            <Setter Property="Margin" Value="0,0,10,10"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+        <!-- ============ HERO ============ -->
+        <Grid Height="316" ClipToBounds="True" Background="#0E1217">
+            <c:RemoteArtwork Url="{Binding PreviewUrl}" FocusX="0.5" FocusY="0.18" KeepPrevious="True"/>
+            <Border Background="{StaticResource HeroBottomScrim}"/>
+            <Border>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0.35"/><GradientStop Color="#F00F131A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,14,14,0">
+                <Button Style="{StaticResource Btn.Overlay}" Padding="0" Width="34" Height="34" Command="{Binding OpenLightboxCommand}" ToolTip="{loc:T drawer_fullscreen}" Margin="0,0,8,0"><c:Icon Data="{StaticResource Icon.Zoom}" Width="16" Height="16"/></Button>
+                <Button Style="{StaticResource Btn.Overlay}" Padding="0" Width="34" Height="34" Command="{Binding DataContext.CloseDrawerCommand, RelativeSource={RelativeSource AncestorType=Window}}" ToolTip="{loc:T close}"><c:Icon Data="{StaticResource Icon.Close}" Width="16" Height="16"/></Button>
+            </StackPanel>
+
+            <Button Style="{StaticResource Btn.Overlay}" Padding="0" Width="34" Height="34" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="14,0,0,0" Command="{Binding StepSkinCommand}" CommandParameter="prev" AutomationProperties.Name="Previous skin"><c:Icon Data="{StaticResource Icon.ChevronLeft}" Width="17" Height="17"/></Button>
+            <Button Style="{StaticResource Btn.Overlay}" Padding="0" Width="34" Height="34" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0" Command="{Binding StepSkinCommand}" CommandParameter="next" AutomationProperties.Name="Next skin"><c:Icon Data="{StaticResource Icon.ChevronRight}" Width="17" Height="17"/></Button>
+
+            <StackPanel VerticalAlignment="Bottom" Margin="28,0,28,20">
+                <TextBlock Text="{Binding TitleLine}" Style="{StaticResource Text.Accent}" FontSize="11"/>
+                <TextBlock Text="{Binding PreviewTitle}" FontFamily="{StaticResource FontDisplay}" FontSize="28" FontWeight="ExtraBold" Foreground="White" TextTrimming="CharacterEllipsis" Margin="0,2,0,8"/>
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="{StaticResource AccentSubtleBrush}" BorderBrush="{DynamicResource AccentBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,2">
+                        <TextBlock Text="{Binding RoleLabel}" Style="{StaticResource Pill.Text}" Foreground="{DynamicResource AccentBrush}"/>
+                    </Border>
+                    <TextBlock Text="{Binding PreviewNote}" Style="{StaticResource Text.Small}" Foreground="#B8C4D2" Margin="12,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- ============ BODY ============ -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <StackPanel Margin="28,22,22,24">
+                <TextBlock Text="{loc:T drawer_lore, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10" Margin="0,0,0,8"/>
+                <TextBlock Text="{Binding Lore}" Style="{StaticResource Text.Body}" FontSize="13" Margin="0,0,0,26"/>
+
+                <Grid Margin="0,0,0,12">
+                    <TextBlock Style="{StaticResource Text.Label}" FontSize="10"><Run Text="{loc:T drawer_skins}"/><Run Text="  ·  "/><Run Text="{Binding SkinCountText, Mode=OneWay}"/></TextBlock>
+                </Grid>
+                <TextBlock Text="{loc:T loading}" Style="{StaticResource Text.Sub}" Visibility="{Binding IsLoading, Converter={x:Static c:Conv.Vis}}"/>
+                <ItemsControl ItemsSource="{Binding Skins}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:CardItem}">
+                            <Button x:Name="Tile" Style="{StaticResource MiniSkin}" Command="{Binding DataContext.SelectSkinCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" ToolTip="{Binding Title}">
+                                <Border x:Name="Frame" CornerRadius="7" BorderThickness="1.5" BorderBrush="{StaticResource BorderSubtleBrush}" ClipToBounds="True" Background="{StaticResource BgCardBrush}">
+                                    <Grid>
+                                        <c:RemoteArtwork Url="{Binding ImageUrl}" FocusY="0.12" FallbackIcon="{StaticResource Icon.Image}"/>
+                                        <Border Background="{StaticResource CardArtScrim}"/>
+                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Bottom" Margin="8,0,8,7" FontSize="11" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap" MaxHeight="30" TextTrimming="CharacterEllipsis" LineHeight="14"/>
+                                        <c:Icon x:Name="FavMark" Data="{StaticResource Icon.Star}" Filled="True" Width="13" Height="13" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,7,7,0" Visibility="Collapsed"/>
+                                    </Grid>
+                                </Border>
+                            </Button>
+                            <DataTemplate.Triggers>
+                                <Trigger SourceName="Tile" Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBorderBrush}"/></Trigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></DataTrigger>
+                                <DataTrigger Binding="{Binding IsFavorite}" Value="True"><Setter TargetName="FavMark" Property="Visibility" Value="Visible"/></DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- chromas of the selected skin -->
+                <StackPanel Visibility="{Binding HasChromas, Converter={x:Static c:Conv.Vis}}" Margin="0,6,0,10">
+                    <TextBlock Text="{loc:T drawer_chromas, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10" Margin="0,0,0,10"/>
+                    <ItemsControl ItemsSource="{Binding Chromas}">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:ChromaChip}">
+                                <Button Style="{StaticResource Chip.Button}" Content="{Binding Label}" Command="{Binding DataContext.SelectChromaCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}">
+                                    <Button.Tag><Binding Path="IsSelected"/></Button.Tag>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="{loc:T drawer_chroma_hint}" Style="{StaticResource Text.Small}" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <!-- mods that touch this champion -->
+                <StackPanel Margin="0,18,0,0">
+                    <TextBlock Text="{Binding ModsHeader}" Style="{StaticResource Text.Label}" FontSize="10" Margin="0,0,0,10"/>
+                    <ItemsControl ItemsSource="{Binding Mods}" Visibility="{Binding HasMods, Converter={x:Static c:Conv.Vis}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:CardItem}">
+                                <Border Style="{StaticResource Panel.Card}" Padding="14,10" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Text.Small}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Style="{StaticResource Btn.Secondary.Sm}" Content="{loc:T drawer_mod_details}" Margin="10,0,0,0" Command="{Binding DataContext.OpenCardCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                        <Button Grid.Column="2" Style="{StaticResource Btn.Primary.Sm}" Content="{loc:T btn_open_in_ltk}" Margin="8,0,0,0" Command="{Binding DataContext.OpenInLtkCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="{loc:T drawer_no_mods}" Style="{StaticResource Text.Sub}" Visibility="{Binding HasMods, Converter={x:Static c:Conv.InvVis}}"/>
+                    <Button Style="{StaticResource Btn.Ghost.Sm}" Command="{Binding FindModsCommand}" HorizontalAlignment="Left" Margin="-10,8,0,0">
+                        <StackPanel Orientation="Horizontal"><TextBlock Text="{loc:T drawer_find_mods}" Foreground="{DynamicResource AccentBrush}"/><c:Icon Data="{StaticResource Icon.External}" Width="13" Height="13" Margin="7,0,0,0" Foreground="{DynamicResource AccentBrush}"/></StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ============ ACTION BAR ============ -->
+        <Border Grid.Row="2" Background="#0B0E13" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Padding="22,14">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <Button x:Name="FavSkin" Style="{StaticResource Btn.Primary}" Command="{Binding ToggleFavoriteCurrentCommand}" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <c:Icon x:Name="FavSkinIcon" Data="{StaticResource Icon.Star}" Width="16" Height="16"/>
+                            <TextBlock x:Name="FavSkinText" Text="{loc:T fav_add_skin}" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="1" Style="{StaticResource Btn.Secondary}" Command="{Binding AddCurrentToCollectionCommand}">
+                        <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Layers}" Width="16" Height="16"/><TextBlock Text="{loc:T collection_add_btn}" Margin="8,0,0,0"/></StackPanel>
+                    </Button>
+                    <Button Grid.Column="2" Style="{StaticResource Btn.Icon}" Command="{Binding CompareCurrentCommand}" Content="↔" ToolTip="{loc:T studio_compare}" HorizontalAlignment="Center"/><Button Grid.Column="3" Style="{StaticResource Btn.Secondary}" Command="{Binding ToggleFavoriteChampionCommand}" ToolTip="{loc:T fav_champion_tip}" x:Name="FavChampion" Padding="12,8">
+                        <StackPanel Orientation="Horizontal">
+                            <c:Icon x:Name="FavChampionIcon" Data="{StaticResource Icon.Heart}" Width="16" Height="16"/>
+                            <TextBlock Text="{Binding Name}" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

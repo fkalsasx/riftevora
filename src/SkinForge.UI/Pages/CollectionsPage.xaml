@@ -1,0 +1,60 @@
+<UserControl x:Class="SkinForge.UI.Pages.CollectionsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:SkinForge.UI.Controls"
+             xmlns:loc="clr-namespace:SkinForge.UI.Localization">
+    <Grid>
+        <!-- ======== LIST ======== -->
+        <Grid Visibility="{Binding IsList, Converter={x:Static c:Conv.Vis}}">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Grid Margin="32,26,32,16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource Text.Page}"/>
+                    <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Text.Sub}" Margin="0,3,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Style="{StaticResource Btn.Primary}" Command="{Binding CreateCommand}" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Plus}" Width="15" Height="15" StrokeThickness="2.2"/><TextBlock Text="{loc:T collection_new}" Margin="8,0,0,0"/></StackPanel>
+                </Button>
+            </Grid>
+            <ItemsControl Grid.Row="1" Style="{StaticResource CardGrid}" ItemsSource="{Binding Collections}" Visibility="{Binding HasCollections, Converter={x:Static c:Conv.Vis}}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:VirtualGridPanel MinItemWidth="268" AspectRatio="0.6" ExtraHeight="82" Gap="16"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,80" MaxWidth="460" Visibility="{Binding HasCollections, Converter={x:Static c:Conv.InvVis}}">
+                <Border Width="68" Height="68" CornerRadius="34" Background="{StaticResource AccentSubtleBrush}" BorderBrush="{DynamicResource AccentBorderBrush}" BorderThickness="1" HorizontalAlignment="Center">
+                    <c:Icon Data="{StaticResource Icon.Layers}" Width="28" Height="28" StrokeThickness="1.5" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="{loc:T collections_empty_title}" Style="{StaticResource Text.Section}" HorizontalAlignment="Center" Margin="0,18,0,6"/>
+                <TextBlock Text="{loc:T collections_empty_text}" Style="{StaticResource Text.Body}" TextAlignment="Center" HorizontalAlignment="Center"/>
+                <Button Style="{StaticResource Btn.Primary}" Command="{Binding CreateCommand}" Content="{loc:T collection_new}" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ======== DETAIL ======== -->
+        <Grid Visibility="{Binding IsDetail, Converter={x:Static c:Conv.Vis}}">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Grid Margin="32,26,32,16">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Button Style="{StaticResource Btn.Secondary}" Command="{Binding BackCommand}" Padding="0" Width="38" Height="38" Margin="0,0,16,0" VerticalAlignment="Center" ToolTip="{loc:T back}">
+                    <c:Icon Data="{StaticResource Icon.ChevronLeft}" Width="18" Height="18"/>
+                </Button>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding SelectedName}" Style="{StaticResource Text.Page}"/>
+                    <TextBlock Text="{Binding SelectedCount}" Style="{StaticResource Text.Sub}" Margin="0,3,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding RenameCommand}" Content="{loc:T collection_rename}" Margin="0,0,10,0"/>
+                    <Button Style="{StaticResource Btn.Danger}" Command="{Binding DeleteCommand}">
+                        <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Trash}" Width="15" Height="15"/><TextBlock Text="{loc:T delete}" Margin="8,0,0,0"/></StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+            <ItemsControl Grid.Row="1" Style="{StaticResource CardGrid}" ItemsSource="{Binding Items}" Visibility="{Binding SelectedEmpty, Converter={x:Static c:Conv.InvVis}}"/>
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,80" MaxWidth="440" Visibility="{Binding SelectedEmpty, Converter={x:Static c:Conv.Vis}}">
+                <c:Icon Data="{StaticResource Icon.Layers}" Width="38" Height="38" StrokeThickness="1.3" Foreground="{StaticResource TextDisabledBrush}" HorizontalAlignment="Center"/>
+                <TextBlock Text="{loc:T collection_empty_title}" Style="{StaticResource Text.Section}" HorizontalAlignment="Center" Margin="0,14,0,4"/>
+                <TextBlock Text="{loc:T collection_empty_text}" Style="{StaticResource Text.Sub}" TextAlignment="Center" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

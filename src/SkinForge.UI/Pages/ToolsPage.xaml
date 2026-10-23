@@ -1,0 +1,144 @@
+<UserControl x:Class="SkinForge.UI.Pages.ToolsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:SkinForge.UI.Controls"
+             xmlns:loc="clr-namespace:SkinForge.UI.Localization"
+             xmlns:vm="clr-namespace:SkinForge.UI.ViewModels">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+        <StackPanel Margin="32,26,32,44" MaxWidth="1200" HorizontalAlignment="Stretch">
+            <Grid Margin="0,0,0,22">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource Text.Page}"/>
+                    <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Text.Sub}" Margin="0,3,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding OpenFolderCommand}" Margin="0,0,10,0" ToolTip="{loc:T mods_open_folder}"><c:Icon Data="{StaticResource Icon.Folder}" Width="16" Height="16"/></Button>
+                    <Button Style="{StaticResource Btn.Primary}" Command="{Binding ScanCommand}">
+                        <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Refresh}" Width="15" Height="15"/><TextBlock Text="{loc:T tools_scan}" Margin="8,0,0,0"/></StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- summary -->
+            <Border Padding="24,20" Margin="0,0,0,22">
+                <Border.Style>
+                    <Style TargetType="Border" BasedOn="{StaticResource Panel}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SummaryKey}" Value="warning"><Setter Property="BorderBrush" Value="#59F59E0B"/></DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Border Width="46" Height="46" CornerRadius="23" Margin="0,0,18,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource SuccessSubtleBrush}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SummaryKey}" Value="warning"><Setter Property="Background" Value="{StaticResource WarningSubtleBrush}"/></DataTrigger>
+                                    <DataTrigger Binding="{Binding SummaryKey}" Value="info"><Setter Property="Background" Value="{StaticResource InfoSubtleBrush}"/></DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <c:Icon Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <c:Icon.Style>
+                                <Style TargetType="c:Icon">
+                                    <Setter Property="Data" Value="{StaticResource Icon.Shield}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SummaryKey}" Value="warning"><Setter Property="Data" Value="{StaticResource Icon.Warning}"/><Setter Property="Foreground" Value="{StaticResource WarningBrush}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding SummaryKey}" Value="info"><Setter Property="Data" Value="{StaticResource Icon.Info}"/><Setter Property="Foreground" Value="{StaticResource InfoBrush}"/></DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </c:Icon.Style>
+                        </c:Icon>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SummaryTitle}" FontSize="17" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="{Binding SummaryText}" Style="{StaticResource Text.Sub}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- conflicts -->
+            <ItemsControl ItemsSource="{Binding Conflicts}" Visibility="{Binding HasConflicts, Converter={x:Static c:Conv.Vis}}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ConflictRow}">
+                        <Border Style="{StaticResource Panel}" Margin="0,0,0,16" Padding="22">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <c:Icon Data="{StaticResource Icon.Warning}" Width="15" Height="15" Foreground="{StaticResource WarningBrush}"/>
+                                    <TextBlock Text="{Binding Headline}" Style="{StaticResource Text.Label}" Foreground="{StaticResource WarningBrush}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding Detail}" Style="{StaticResource Text.Small}" FontFamily="{StaticResource FontMono}" Margin="0,0,0,16" TextTrimming="CharacterEllipsis"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="56"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource Panel.Card}" Padding="16,14">
+                                        <StackPanel>
+                                            <TextBlock Text="A" Style="{StaticResource Text.Accent}"/>
+                                            <TextBlock Text="{Binding FirstName}" FontSize="15" FontWeight="Bold" Foreground="White" Margin="0,4,0,2" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding FirstMeta}" Style="{StaticResource Text.Small}" Margin="0,0,0,12"/>
+                                            <Button Style="{StaticResource Btn.Secondary.Sm}" HorizontalAlignment="Left" Content="{loc:T btn_open_in_ltk}" Command="{Binding DataContext.OpenPackageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Conflict.First}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Text="VS" FontFamily="{StaticResource FontMono}" FontWeight="ExtraBold" Foreground="{StaticResource TextMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <Border Grid.Column="2" Style="{StaticResource Panel.Card}" Padding="16,14">
+                                        <StackPanel>
+                                            <TextBlock Text="B" Style="{StaticResource Text.Label}"/>
+                                            <TextBlock Text="{Binding SecondName}" FontSize="15" FontWeight="Bold" Foreground="White" Margin="0,4,0,2" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding SecondMeta}" Style="{StaticResource Text.Small}" Margin="0,0,0,12"/>
+                                            <Button Style="{StaticResource Btn.Secondary.Sm}" HorizontalAlignment="Left" Content="{loc:T btn_open_in_ltk}" Command="{Binding DataContext.OpenPackageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Conflict.Second}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <Border Margin="0,16,0,0" Background="#0DFFFFFF" CornerRadius="6" Padding="14,10" Visibility="{Binding HasSamples, Converter={x:Static c:Conv.Vis}}">
+                                    <TextBlock Text="{Binding Samples}" FontFamily="{StaticResource FontMono}" FontSize="11" Foreground="{StaticResource TextMutedBrush}" TextTrimming="CharacterEllipsis" LineHeight="17"/>
+                                </Border>
+                                <TextBlock Text="{loc:T tools_advice}" Style="{StaticResource Text.Sub}" Margin="0,14,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- package table -->
+            <StackPanel Visibility="{Binding HasPackages, Converter={x:Static c:Conv.Vis}}">
+                <TextBlock Text="{loc:T tools_packages}" Style="{StaticResource Text.Section}" Margin="0,8,0,12"/>
+                <Border Style="{StaticResource Panel}" Padding="0">
+                    <StackPanel>
+                        <Grid Margin="20,12">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="90"/><ColumnDefinition Width="100"/><ColumnDefinition Width="90"/><ColumnDefinition Width="50"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="{loc:T col_package, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="1" Text="{loc:T col_champions, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="2" Text="{loc:T col_format, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="3" Text="{loc:T col_files, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="4" Text="{loc:T col_size, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Packages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:PackageRow}">
+                                    <Border BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,1,0,0" Background="Transparent" x:Name="Row">
+                                        <Grid Margin="20,12">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="2*"/><ColumnDefinition Width="90"/><ColumnDefinition Width="100"/><ColumnDefinition Width="90"/><ColumnDefinition Width="50"/></Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="White" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Champions}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Format}" FontFamily="{StaticResource FontMono}" FontSize="11.5" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Files}" FontFamily="{StaticResource FontMono}" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="4" Text="{Binding Size}" FontFamily="{StaticResource FontMono}" FontSize="11.5" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="5" Style="{StaticResource Btn.Icon}" Width="28" Height="28" HorizontalAlignment="Right" Command="{Binding DataContext.InspectPackageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Package}" ToolTip="{loc:T tools_inspect}">
+                                                <c:Icon Data="{StaticResource Icon.Eye}" Width="15" Height="15"/>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers><Trigger SourceName="Row" Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="#08FFFFFF"/></Trigger></DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="{loc:T tools_footnote}" Style="{StaticResource Text.Sub}" Margin="2,12,0,0"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

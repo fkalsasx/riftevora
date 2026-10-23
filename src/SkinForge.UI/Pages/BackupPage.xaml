@@ -1,0 +1,125 @@
+<UserControl x:Class="SkinForge.UI.Pages.BackupPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:SkinForge.UI.Controls"
+             xmlns:loc="clr-namespace:SkinForge.UI.Localization"
+             xmlns:vm="clr-namespace:SkinForge.UI.ViewModels">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+        <StackPanel Margin="32,26,32,44" MaxWidth="1200" HorizontalAlignment="Stretch">
+            <StackPanel Margin="0,0,0,22">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Text.Page}"/>
+                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Text.Sub}" Margin="0,3,0,0"/>
+            </StackPanel>
+
+            <!-- BACKUP -->
+            <Border Style="{StaticResource Panel}" Padding="24" Margin="0,0,0,22">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{loc:T backup_heading}" Style="{StaticResource Text.Section}"/>
+                            <TextBlock Text="{loc:T backup_text}" Style="{StaticResource Text.Sub}" Margin="0,4,0,0" MaxWidth="640" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                            <Button Style="{StaticResource Btn.Secondary}" Command="{Binding RestoreCommand}" Margin="0,0,10,0" IsEnabled="{Binding IsWorking, Converter={x:Static c:Conv.Not}}">
+                                <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Import}" Width="15" Height="15"/><TextBlock Text="{loc:T backup_restore_btn}" Margin="8,0,0,0"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource Btn.Primary}" Command="{Binding CreateCommand}" IsEnabled="{Binding IsWorking, Converter={x:Static c:Conv.Not}}">
+                                <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Download}" Width="15" Height="15"/><TextBlock Text="{loc:T backup_create_btn}" Margin="8,0,0,0"/></StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                    <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding IncludePackages}" Margin="0,18,0,0">
+                        <StackPanel>
+                            <TextBlock Text="{loc:T backup_include_packages}" FontWeight="SemiBold" Foreground="White"/>
+                            <TextBlock Text="{Binding PackagesSizeText}" Style="{StaticResource Text.Small}"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <ProgressBar Style="{StaticResource Progress.Thin}" Minimum="0" Maximum="1" Value="{Binding WorkProgress, Mode=OneWay}" Margin="0,16,0,0" Background="#14FFFFFF" Visibility="{Binding IsWorking, Converter={x:Static c:Conv.Vis}}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- SNAPSHOT LIST -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{loc:T backup_list}" Style="{StaticResource Text.Section}"/>
+                <Button Grid.Column="1" Style="{StaticResource Btn.Ghost.Sm}" Command="{Binding OpenBackupFolderCommand}" Content="{loc:T show_in_folder}"/>
+            </Grid>
+            <Border Style="{StaticResource Panel}" Padding="0" Margin="0,0,0,28">
+                <Grid>
+                    <TextBlock Text="{loc:T backup_none}" Style="{StaticResource Text.Sub}" Margin="22,20" Visibility="{Binding HasBackups, Converter={x:Static c:Conv.InvVis}}"/>
+                    <ItemsControl ItemsSource="{Binding Backups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:BackupRow}">
+                                <Border BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,0,0,1" Padding="22,12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                        <c:Icon Data="{StaticResource Icon.Package}" Width="20" Height="20" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,14,0" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Style="{StaticResource Text.Small}"><Run Text="{Binding When, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Size, Mode=OneWay}"/></TextBlock>
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Style="{StaticResource Btn.Secondary.Sm}" Content="{loc:T backup_restore_btn}" Margin="10,0,0,0" Command="{Binding DataContext.RestoreCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"/>
+                                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="6,0,0,0">
+                                            <Button Style="{StaticResource Btn.Icon}" Width="30" Height="30" Command="{Binding DataContext.ShowFileCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" ToolTip="{loc:T show_in_folder}"><c:Icon Data="{StaticResource Icon.Folder}" Width="15" Height="15"/></Button>
+                                            <Button Style="{StaticResource Btn.Icon}" Width="30" Height="30" Command="{Binding DataContext.DeleteBackupCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" ToolTip="{loc:T delete}"><c:Icon Data="{StaticResource Icon.Trash}" Width="15" Height="15"/></Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Border>
+
+            <!-- ACTIVITY -->
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{loc:T history_heading}" Style="{StaticResource Text.Section}"/>
+                    <TextBlock Text="{loc:T history_text}" Style="{StaticResource Text.Sub}" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Style="{StaticResource Btn.Ghost.Sm}" Command="{Binding ClearHistoryCommand}" Content="{loc:T history_clear}" VerticalAlignment="Center"/>
+            </Grid>
+            <Border Style="{StaticResource Panel}" Padding="0">
+                <Grid>
+                    <TextBlock Text="{loc:T history_none}" Style="{StaticResource Text.Sub}" Margin="22,20" Visibility="{Binding HasHistory, Converter={x:Static c:Conv.InvVis}}"/>
+                    <StackPanel Visibility="{Binding HasHistory, Converter={x:Static c:Conv.Vis}}">
+                        <Grid Margin="22,12">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/><ColumnDefinition Width="70"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="{loc:T col_time, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="1" Text="{loc:T col_action, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="2" Text="{loc:T col_target, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/>
+                            <TextBlock Grid.Column="3" Text="{loc:T col_result, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding History}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:HistoryRow}">
+                                    <Border BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,1,0,0" x:Name="Row" Background="Transparent">
+                                        <Grid Margin="22,11">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/><ColumnDefinition Width="70"/></Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding When}" FontFamily="{StaticResource FontMono}" FontSize="11.5" Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding ActionText}" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding Target}" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Detail}" Style="{StaticResource Text.Small}" TextTrimming="CharacterEllipsis" Visibility="{Binding Detail, Converter={x:Static c:Conv.NullCollapsed}}"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="3" x:Name="Tag" CornerRadius="4" Padding="7,2" HorizontalAlignment="Right" VerticalAlignment="Center" Background="{StaticResource SuccessSubtleBrush}">
+                                                <TextBlock x:Name="TagText" Style="{StaticResource Pill.Text}" Text="OK" Foreground="{StaticResource SuccessBrush}"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding ResultKey}" Value="warning"><Setter TargetName="Tag" Property="Background" Value="{StaticResource WarningSubtleBrush}"/><Setter TargetName="TagText" Property="Foreground" Value="{StaticResource WarningBrush}"/><Setter TargetName="TagText" Property="Text" Value="WARN"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding ResultKey}" Value="error"><Setter TargetName="Tag" Property="Background" Value="{StaticResource DangerSubtleBrush}"/><Setter TargetName="TagText" Property="Foreground" Value="{StaticResource DangerBrush}"/><Setter TargetName="TagText" Property="Text" Value="FAIL"/></DataTrigger>
+                                        <Trigger SourceName="Row" Property="IsMouseOver" Value="True"><Setter TargetName="Row" Property="Background" Value="#08FFFFFF"/></Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

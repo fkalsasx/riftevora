@@ -1,0 +1,217 @@
+<UserControl x:Class="SkinForge.UI.Pages.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:SkinForge.UI.Controls"
+             xmlns:loc="clr-namespace:SkinForge.UI.Localization"
+             xmlns:vm="clr-namespace:SkinForge.UI.ViewModels">
+    <UserControl.Resources>
+        <Style x:Key="SettingTitle" TargetType="TextBlock"><Setter Property="FontWeight" Value="Bold"/><Setter Property="FontSize" Value="14"/><Setter Property="Foreground" Value="White"/></Style>
+        <Style x:Key="SettingGroup" TargetType="StackPanel"><Setter Property="Margin" Value="0,0,0,28"/></Style>
+        <Style x:Key="PathBox" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource BgInputBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="MaxWidth" Value="620"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="AccentSwatch" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Frame" Width="132" Padding="14,12" CornerRadius="8" Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="18" Height="18" Fill="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center" TextElement.FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource BorderBrightBrush}"/></Trigger>
+                            <Trigger Property="IsChecked" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter TargetName="Frame" Property="Background" Value="{DynamicResource AccentSubtleBrush}"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+        <StackPanel Margin="32,26,32,44" MaxWidth="1200" HorizontalAlignment="Stretch">
+            <StackPanel Margin="0,0,0,22">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource Text.Page}"/>
+                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Text.Sub}" Margin="0,3,0,0"/>
+            </StackPanel>
+
+            <WrapPanel Margin="0,0,0,22"><Button Style="{StaticResource Btn.Secondary.Sm}" Margin="0,0,8,8" Content="{loc:T nav_tools}" Command="{Binding Shell.NavigateCommand}" CommandParameter="tools"/><Button Style="{StaticResource Btn.Secondary.Sm}" Margin="0,0,8,8" Content="{loc:T nav_diagnostics}" Command="{Binding Shell.NavigateCommand}" CommandParameter="diagnostics"/><Button Style="{StaticResource Btn.Secondary.Sm}" Margin="0,0,8,8" Content="{loc:T nav_backup}" Command="{Binding Shell.NavigateCommand}" CommandParameter="backup"/><Button Style="{StaticResource Btn.Secondary.Sm}" Margin="0,0,8,8" Content="{loc:T nav_about}" Command="{Binding Shell.NavigateCommand}" CommandParameter="about"/></WrapPanel><Border Style="{StaticResource Panel}" Padding="0" MinHeight="520">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Border Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="0,0,1,0" CornerRadius="8,0,0,8" Padding="12">
+                        <StackPanel>
+                            <RadioButton Style="{StaticResource Tab.Radio}" Content="{loc:T settings_general}" GroupName="SettingsTab" IsChecked="{Binding Tab, Converter={x:Static c:Conv.Eq}, ConverterParameter=general, Mode=TwoWay}"/>
+                            <RadioButton Style="{StaticResource Tab.Radio}" Content="{loc:T settings_appearance}" GroupName="SettingsTab" IsChecked="{Binding Tab, Converter={x:Static c:Conv.Eq}, ConverterParameter=appearance, Mode=TwoWay}"/>
+                            <RadioButton Style="{StaticResource Tab.Radio}" Content="{loc:T settings_engine}" GroupName="SettingsTab" IsChecked="{Binding Tab, Converter={x:Static c:Conv.Eq}, ConverterParameter=engine, Mode=TwoWay}"/>
+                            <RadioButton Style="{StaticResource Tab.Radio}" Content="{loc:T settings_game}" GroupName="SettingsTab" IsChecked="{Binding Tab, Converter={x:Static c:Conv.Eq}, ConverterParameter=game, Mode=TwoWay}"/>
+                            <RadioButton Style="{StaticResource Tab.Radio}" Content="{loc:T settings_storage}" GroupName="SettingsTab" IsChecked="{Binding Tab, Converter={x:Static c:Conv.Eq}, ConverterParameter=storage, Mode=TwoWay}"/>
+                            <RadioButton Style="{StaticResource Tab.Radio}" Content="{loc:T settings_privacy}" GroupName="SettingsTab" IsChecked="{Binding Tab, Converter={x:Static c:Conv.Eq}, ConverterParameter=privacy, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Column="1" Margin="32,28,32,24">
+                        <!-- GENERAL -->
+                        <StackPanel Visibility="{Binding Tab, Converter={x:Static c:Conv.EqVis}, ConverterParameter=general}">
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_language}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_language_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10"/>
+                                <ItemsControl ItemsSource="{Binding Languages}">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:ChoiceOption}">
+                                            <Button Style="{StaticResource Chip.Button}" Content="{Binding Label}" Command="{Binding DataContext.SetLanguageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Key}">
+                                                <Button.Tag>
+                                                    <MultiBinding Converter="{x:Static c:Conv.MultiEq}"><Binding Path="Key"/><Binding Path="DataContext.Language" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/></MultiBinding>
+                                                </Button.Tag>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_startpage}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_startpage_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10"/>
+                                <ItemsControl ItemsSource="{Binding StartPages}">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:ChoiceOption}">
+                                            <Button Style="{StaticResource Chip.Button}" Content="{Binding Label}" Command="{Binding DataContext.SetStartPageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Key}">
+                                                <Button.Tag>
+                                                    <MultiBinding Converter="{x:Static c:Conv.MultiEq}"><Binding Path="Key"/><Binding Path="DataContext.StartPage" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/></MultiBinding>
+                                                </Button.Tag>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_setup}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_setup_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10"/>
+                                <Button Style="{StaticResource Btn.Secondary}" Command="{Binding RunSetupCommand}" Content="{loc:T setting_setup_btn}" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- APPEARANCE -->
+                        <StackPanel Visibility="{Binding Tab, Converter={x:Static c:Conv.EqVis}, ConverterParameter=appearance}">
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_accent}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_accent_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,12"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource AccentSwatch}" GroupName="Accent" Content="{loc:T accent_gold}" Tag="#BAE9B1" IsChecked="{Binding Accent, Converter={x:Static c:Conv.Eq}, ConverterParameter=gold, Mode=TwoWay}"/>
+                                    <RadioButton Style="{StaticResource AccentSwatch}" GroupName="Accent" Content="{loc:T accent_cyan}" Tag="#0AC8B9" IsChecked="{Binding Accent, Converter={x:Static c:Conv.Eq}, ConverterParameter=cyan, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ReduceMotion, Mode=TwoWay}">
+                                    <StackPanel><TextBlock Text="{loc:T setting_motion}" Style="{StaticResource SettingTitle}"/><TextBlock Text="{loc:T setting_motion_sub}" Style="{StaticResource Text.Sub}"/></StackPanel>
+                                </CheckBox>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding Compact, Mode=TwoWay}">
+                                    <StackPanel><TextBlock Text="{loc:T setting_compact}" Style="{StaticResource SettingTitle}"/><TextBlock Text="{loc:T setting_compact_sub}" Style="{StaticResource Text.Sub}"/></StackPanel>
+                                </CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- ENGINE -->
+                        <StackPanel Visibility="{Binding Tab, Converter={x:Static c:Conv.EqVis}, ConverterParameter=engine}">
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_ltk}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_ltk_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10" MaxWidth="620" HorizontalAlignment="Left"/>
+                                <Border Style="{StaticResource PathBox}"><TextBlock Text="{Binding LtkPathText}" FontFamily="{StaticResource FontMono}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" ToolTip="{Binding LtkPathText}"/></Border>
+                                <TextBlock Style="{StaticResource Text.Small}" Margin="2,8,0,0"><Run Text="{loc:T setting_version}"/><Run Text=" "/><Run Text="{Binding LtkVersionText, Mode=OneWay}" Foreground="White"/></TextBlock>
+                                <WrapPanel Margin="0,16,0,0">
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding ChooseLtkFileCommand}" Content="{loc:T setting_ltk_choose}" Margin="0,0,10,8"/>
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding RecheckCommand}" Content="{loc:T setting_recheck}" Margin="0,0,10,8"/>
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding OpenLtkCommand}" Margin="0,0,10,8">
+                                        <StackPanel Orientation="Horizontal"><TextBlock Text="{loc:T btn_open_ltk}"/><c:Icon Data="{StaticResource Icon.External}" Width="14" Height="14" Margin="8,0,0,0"/></StackPanel>
+                                    </Button>
+                                    <Button Style="{StaticResource Btn.Ghost}" Command="{Binding DownloadLtkCommand}" Content="{loc:T setup_download}" Margin="0,0,10,8"/>
+                                </WrapPanel>
+                            </StackPanel>
+                            <Border Style="{StaticResource Panel.Card}" Padding="18,14" MaxWidth="620" HorizontalAlignment="Left">
+                                <TextBlock Text="{loc:T setting_ltk_note}" Style="{StaticResource Text.Sub}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- GAME -->
+                        <StackPanel Visibility="{Binding Tab, Converter={x:Static c:Conv.EqVis}, ConverterParameter=game}">
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_game}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_game_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10" MaxWidth="620" HorizontalAlignment="Left"/>
+                                <Border Style="{StaticResource PathBox}"><TextBlock Text="{Binding GamePathText}" FontFamily="{StaticResource FontMono}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" ToolTip="{Binding GamePathText}"/></Border>
+                                <TextBlock Style="{StaticResource Text.Small}" Margin="2,8,0,0"><Run Text="{loc:T setting_game_version}"/><Run Text=" "/><Run Text="{Binding GameVersionText, Mode=OneWay}" Foreground="White"/><Run Text="  ·  "/><Run Text="{Binding GameSourceText, Mode=OneWay}"/></TextBlock>
+                                <WrapPanel Margin="0,16,0,0">
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding ChooseGameFolderCommand}" Content="{loc:T setting_game_choose}" Margin="0,0,10,8"/>
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding AutoDetectGameCommand}" Content="{loc:T setting_game_auto}" Margin="0,0,10,8" Visibility="{Binding GameManual, Converter={x:Static c:Conv.Vis}}"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- STORAGE -->
+                        <StackPanel Visibility="{Binding Tab, Converter={x:Static c:Conv.EqVis}, ConverterParameter=storage}">
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_data}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{loc:T setting_data_sub}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10"/>
+                                <Border Style="{StaticResource PathBox}"><TextBlock Text="{Binding DataRootText}" FontFamily="{StaticResource FontMono}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/></Border>
+                                <WrapPanel Margin="0,14,0,0">
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding OpenDataCommand}" Content="{loc:T setting_open_data}" Margin="0,0,10,8"/>
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding OpenLibraryFolderCommand}" Content="{loc:T setting_open_library}" Margin="0,0,10,8"/>
+                                    <Button Style="{StaticResource Btn.Secondary}" Command="{Binding OpenLogsCommand}" Content="{loc:T setting_open_logs}" Margin="0,0,10,8"/>
+                                </WrapPanel>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <UniformGrid Columns="3" MaxWidth="620" HorizontalAlignment="Left">
+                                    <Border Style="{StaticResource Panel.Card}" Padding="16,12" Margin="0,0,10,0"><StackPanel><TextBlock Text="{loc:T size_art_cache, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/><TextBlock Text="{Binding CacheSize}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,6,0,0"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Panel.Card}" Padding="16,12" Margin="0,0,10,0"><StackPanel><TextBlock Text="{loc:T size_packages, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/><TextBlock Text="{Binding PackagesSize}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,6,0,0"/></StackPanel></Border>
+                                    <Border Style="{StaticResource Panel.Card}" Padding="16,12"><StackPanel><TextBlock Text="{loc:T size_logs, Upper=True}" Style="{StaticResource Text.Label}" FontSize="10"/><TextBlock Text="{Binding LogsSize}" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,6,0,0"/></StackPanel></Border>
+                                </UniformGrid>
+                                <Button Style="{StaticResource Btn.Secondary}" Command="{Binding ClearImageCacheCommand}" Content="{loc:T diag_clear_cache}" HorizontalAlignment="Left" Margin="0,14,0,0"/>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding Offline, Mode=TwoWay}">
+                                    <StackPanel><TextBlock Text="{loc:T setting_offline}" Style="{StaticResource SettingTitle}"/><TextBlock Text="{loc:T setting_offline_sub}" Style="{StaticResource Text.Sub}" MaxWidth="560" HorizontalAlignment="Left"/></StackPanel>
+                                </CheckBox>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_catalog}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Style="{StaticResource Text.Sub}" Margin="0,2,0,10"><Run Text="{loc:T setting_patch}"/><Run Text=" "/><Run Text="{Binding PatchText, Mode=OneWay}" Foreground="White"/><Run Text="  ·  "/><Run Text="{Binding CatalogStateText, Mode=OneWay}"/></TextBlock>
+                                <Button Style="{StaticResource Btn.Secondary}" Command="{Binding RefreshCatalogCommand}" HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Refresh}" Width="15" Height="15"/><TextBlock Text="{loc:T setting_catalog_refresh}" Margin="8,0,0,0"/></StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- PRIVACY -->
+                        <StackPanel Visibility="{Binding Tab, Converter={x:Static c:Conv.EqVis}, ConverterParameter=privacy}">
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T privacy_heading}" Style="{StaticResource SettingTitle}"/>
+                                <StackPanel Margin="0,10,0,0" MaxWidth="640" HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8"><c:Icon Data="{StaticResource Icon.Check}" Width="15" Height="15" Foreground="{StaticResource SuccessBrush}"/><TextBlock Text="{loc:T privacy_1}" Style="{StaticResource Text.Body}" Margin="10,0,0,0" FontSize="13"/></StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8"><c:Icon Data="{StaticResource Icon.Check}" Width="15" Height="15" Foreground="{StaticResource SuccessBrush}"/><TextBlock Text="{loc:T privacy_2}" Style="{StaticResource Text.Body}" Margin="10,0,0,0" FontSize="13"/></StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8"><c:Icon Data="{StaticResource Icon.Check}" Width="15" Height="15" Foreground="{StaticResource SuccessBrush}"/><TextBlock Text="{loc:T privacy_3}" Style="{StaticResource Text.Body}" Margin="10,0,0,0" FontSize="13"/></StackPanel>
+                                    <StackPanel Orientation="Horizontal"><c:Icon Data="{StaticResource Icon.Check}" Width="15" Height="15" Foreground="{StaticResource SuccessBrush}"/><TextBlock Text="{loc:T privacy_4}" Style="{StaticResource Text.Body}" Margin="10,0,0,0" FontSize="13"/></StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource SettingGroup}">
+                                <TextBlock Text="{loc:T setting_risk}" Style="{StaticResource SettingTitle}"/>
+                                <TextBlock Text="{Binding RiskText}" Style="{StaticResource Text.Sub}" Margin="0,2,0,10"/>
+                                <Button Style="{StaticResource Btn.Secondary}" Command="{Binding ResetRiskCommand}" Content="{loc:T setting_risk_reset}" HorizontalAlignment="Left" IsEnabled="{Binding RiskAccepted}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
