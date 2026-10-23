@@ -23,19 +23,19 @@ public static class GameLocator
                 {
                     foreach (var client in clients.EnumerateObject())
                     {
-                        if (!client.Name.Contains("League of Legends", StringComparison.OrdinalIgnoreCase)) continue;
                         if (Normalize(client.Name) is { } root) return Build(root, client.Value.GetString(), "Riot Client kaydı");
                     }
                 }
             }
         }
-        catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException) { }
+        catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException or InvalidOperationException) { }
 
         var candidates = new List<string>(extraRoots ?? []);
         foreach (var drive in DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady))
         {
             candidates.Add(Path.Combine(drive.RootDirectory.FullName, "Riot Games", "League of Legends"));
             candidates.Add(Path.Combine(drive.RootDirectory.FullName, "Program Files", "Riot Games", "League of Legends"));
+            candidates.Add(Path.Combine(drive.RootDirectory.FullName, "Program Files (x86)", "Riot Games", "League of Legends"));
         }
         foreach (var candidate in candidates)
             if (Normalize(candidate) is { } root) return Build(root, null, "Standart klasör");

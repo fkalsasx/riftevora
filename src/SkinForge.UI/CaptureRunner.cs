@@ -45,6 +45,30 @@ public static class CaptureRunner
         }
         app.ToggleFavorite(favorite);
         checks.Add("Favorite survives reload");
+        if (Environment.GetEnvironmentVariable("SKINFORGE_SETUP_QA") == "1")
+        {
+            if (app.Game == null || !app.LtkInstalled) throw new InvalidDataException("QA: installed League and LTK required");
+            // Exercise the real UI command against the detected installation, with a disposable LTK settings file.
+            var ltkSettings = Path.Combine(directory, "ltk-test", "settings.json");
+            var setupApp = new AppServices
+            {
+                Catalog = app.Catalog, Ltk = app.Ltk, Library = app.Library, Store = app.Store, DataRoot = app.DataRoot,
+                LtkGame = new SkinForge.Infrastructure.ModProviders.LtkGameConfiguration(ltkSettings, () => false)
+            };
+            var setupShell = new ShellViewModel(setupApp);
+            await setupShell.SetUpEnvironmentAsync(true, app.Game.RootDirectory);
+            if (setupShell.IsSetupBusy || setupShell.SetupPercent != 100 || setupShell.SetupStatus != SkinForge.UI.Localization.Loc.T("setup_complete"))
+                throw new InvalidDataException("QA: add game failed: " + setupShell.SetupStatus);
+            using var ltkDocument = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(ltkSettings));
+            if (ltkDocument.RootElement.GetProperty("leaguePath").GetString() != app.Game.RootDirectory)
+                throw new InvalidDataException("QA: LTK did not receive detected game path");
+            await setupShell.SetUpEnvironmentAsync(true, app.Game.RootDirectory);
+            if (Directory.GetFiles(Path.GetDirectoryName(ltkSettings)!, "*.bak").Length != 0)
+                throw new InvalidDataException("QA: repeated setup changed matching preferences");
+            checks.Add("Add game UI detects installed League and LTK, saves the official LTK game preference and is idempotent");
+            shell.SetupStatus = setupShell.SetupStatus;
+            shell.SetupPercent = 100;
+        }
         await File.WriteAllTextAsync(Path.Combine(directory, "checks.json"), System.Text.Json.JsonSerializer.Serialize(checks));
         async Task Shot(string name, int delay = 1500)
         {
@@ -57,6 +81,13 @@ public static class CaptureRunner
         {
             foreach (var key in selectedPages.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
+                if (key == "setup") { await shell.RunSetupIfNeededAsync(); await Shot(key); shell.Dialog = null; continue; }
+                if (key.StartsWith("settings-"))
+                {
+                    shell.Navigate("settings");
+                    ((SettingsViewModel)shell.Page("settings")).Tab = key[9..];
+                    await Shot(key); continue;
+                }
                 shell.Navigate(key);
                 await Shot(key);
             }

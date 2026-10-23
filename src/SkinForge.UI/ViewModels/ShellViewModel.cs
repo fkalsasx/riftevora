@@ -1,11 +1,14 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using SkinForge.Infrastructure.Packaging;
+using SkinForge.Infrastructure.ModProviders;
+using SkinForge.Infrastructure.SystemInfo;
 using SkinForge.Infrastructure.Workspace;
 using SkinForge.UI.Controls;
 using SkinForge.UI.Localization;
@@ -30,7 +33,7 @@ public abstract class PageViewModel : ViewModelBase
 /// <summary>Owns navigation, the modal layer, toasts and every cross-page action.</summary>
 public sealed partial class ShellViewModel : ViewModelBase
 {
-    public const string ReleaseVersion = "3.0.0";
+    public const string ReleaseVersion = "3.1.0";
     private readonly Dictionary<string, PageViewModel> _pages = new();
 
     public ShellViewModel(AppServices app)
@@ -64,6 +67,17 @@ public sealed partial class ShellViewModel : ViewModelBase
     [ObservableProperty] private bool _isSplashVisible = true;
     [ObservableProperty] private bool _isDragging;
     [ObservableProperty] private bool _isReady;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AddGameCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadLtkCommand))]
+    private bool _isSetupBusy;
+    [ObservableProperty] private string _setupStatus = "";
+    [ObservableProperty] private double _setupPercent;
+    [ObservableProperty] private bool _setupCanCancel;
+    private CancellationTokenSource? _setupCancellation;
+    public bool HasSetupStatus => !string.IsNullOrWhiteSpace(SetupStatus);
+    private bool CanSetUp() => !IsSetupBusy;
+    partial void OnSetupStatusChanged(string value) => OnPropertyChanged(nameof(HasSetupStatus));
 
     // ----- navigation -----
     public string Breadcrumb => CurrentPage?.Title ?? "";
@@ -410,7 +424,73 @@ public sealed partial class ShellViewModel : ViewModelBase
     }
 
     [RelayCommand] private void FindMods() => OpenUrl("https://www.runeforge.dev/");
-    [RelayCommand] private void DownloadLtk() => OpenUrl("https://github.com/LeagueToolkit/ltk-manager/releases");
+    [RelayCommand(CanExecute = nameof(CanSetUp))]
+    private async Task DownloadLtk() => await SetUpEnvironmentAsync(false);
+
+    [RelayCommand(CanExecute = nameof(CanSetUp))]
+    private async Task AddGame() => await SetUpEnvironmentAsync(true);
+
+    [RelayCommand] private void CancelSetup() { if (SetupCanCancel) _setupCancellation?.Cancel(); }
+
+    public async Task SetUpEnvironmentAsync(bool requireGame, string? selectedGame = null)
+    {
+        if (IsSetupBusy) return;
+        IsSetupBusy = true; SetupCanCancel = true; SetupPercent = 0;
+        using var cancellation = new CancellationTokenSource();
+        _setupCancellation = cancellation;
+        var ct = cancellation.Token;
+        try
+        {
+            SetupStatus = Loc.T("setup_progress_detect");
+            var game = await Task.Run(() => GameLocator.Detect(selectedGame ?? App.Store.Data.GamePath), ct);
+            if (requireGame && (game == null || !File.Exists(Path.Combine(game.RootDirectory, "Game", "League of Legends.exe"))))
+            {
+                var picker = new OpenFolderDialog { Title = Loc.T("settings_game_pick") };
+                if (picker.ShowDialog() != true) { SetupStatus = Loc.T("setup_cancelled"); return; }
+                var root = GameLocator.Normalize(picker.FolderName);
+                if (root == null || !File.Exists(Path.Combine(root, "Game", "League of Legends.exe")))
+                    throw new LtkSetupException("settings_game_invalid");
+                game = GameLocator.Detect(root);
+            }
+            await App.RefreshEnvironmentAsync();
+            if (!App.LtkInstalled)
+            {
+                var progress = new Progress<LtkSetupProgress>(p =>
+                {
+                    SetupStatus = p.Stage == "download" ? Loc.T("setup_progress_download", (int)p.Percent) : Loc.T("setup_progress_" + p.Stage);
+                    SetupPercent = p.Percent;
+                    if (p.Stage == "install") SetupCanCancel = false;
+                });
+                await App.LtkSetup.InstallAsync(Path.Combine(App.DataRoot, "Downloads", "LTK"), progress, ct);
+                await App.RefreshEnvironmentAsync();
+                if (!App.LtkInstalled) throw new LtkSetupException("setup_install_not_found");
+            }
+            ct.ThrowIfCancellationRequested();
+            App.Store.Data.LtkPath = App.LtkPath;
+            if (game != null)
+            {
+                SetupStatus = Loc.T("setup_progress_configure");
+                await App.LtkGame.ConfigureAsync(game.RootDirectory, ct);
+                App.Store.Data.GamePath = game.RootDirectory;
+            }
+            App.Store.Flush();
+            await App.RefreshEnvironmentAsync();
+            SetupPercent = 100;
+            SetupStatus = Loc.T(game != null ? "setup_complete" : "setup_ltk_complete");
+            Notify(SetupStatus, ToastTone.Success);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { SetupStatus = Loc.T("setup_cancelled"); }
+        catch (LtkSetupException ex) { SetupStatus = Loc.T(ex.Message); Notify(SetupStatus, ToastTone.Warning); }
+        catch (Exception ex) when (ex is HttpRequestException or IOException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception or OperationCanceledException)
+        {
+            SetupStatus = Loc.T("setup_failed", ex.Message); Notify(SetupStatus, ToastTone.Error);
+        }
+        finally
+        {
+            _setupCancellation = null; SetupCanCancel = false; IsSetupBusy = false;
+            await App.RefreshEnvironmentAsync();
+        }
+    }
 
     public void ApplyLanguage(string code)
     {
@@ -442,11 +522,12 @@ public sealed partial class ShellViewModel : ViewModelBase
     public async Task RunSetupIfNeededAsync()
     {
         if (App.Store.Data.SetupCompleted) return;
-        var setup = new SetupDialog(App)
+        var setup = new SetupDialog(App, this)
         {
             Recheck = async () => { await App.RefreshEnvironmentAsync(); },
             ChooseLtk = () => { if (Page("settings") is SettingsViewModel s) { s.ChooseLtkFile(); } },
-            DownloadLtk = () => OpenUrl("https://github.com/LeagueToolkit/ltk-manager/releases"),
+            DownloadLtk = async () => await SetUpEnvironmentAsync(false),
+            AddGame = async () => await SetUpEnvironmentAsync(true),
             Done = () => { App.Store.Data.SetupCompleted = true; App.Store.SaveSoon(); }
         };
         App.EnvironmentChanged += (_, _) => RunOnUi(setup.Refresh);

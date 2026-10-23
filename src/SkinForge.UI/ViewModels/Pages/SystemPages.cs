@@ -331,17 +331,16 @@ public sealed partial class SettingsViewModel : PageViewModel
     [RelayCommand] private void DownloadLtk() => Shell.DownloadLtkCommand.Execute(null);
 
     [RelayCommand]
-    public void ChooseGameFolder()
+    public async Task ChooseGameFolder()
     {
         var picker = new OpenFolderDialog { Title = Loc.T("settings_game_pick") };
         if (picker.ShowDialog() != true) return;
         if (GameLocator.Normalize(picker.FolderName) == null) { Shell.Notify(Loc.T("settings_game_invalid"), ToastTone.Error); return; }
-        App.Store.Data.GamePath = picker.FolderName; App.Store.SaveSoon();
-        _ = App.RefreshEnvironmentAsync();
+        await Shell.SetUpEnvironmentAsync(true, picker.FolderName);
     }
 
     [RelayCommand]
-    private void AutoDetectGame() { App.Store.Data.GamePath = null; App.Store.SaveSoon(); _ = App.RefreshEnvironmentAsync(); }
+    private async Task AutoDetectGame() => await Shell.SetUpEnvironmentAsync(true);
 
     [RelayCommand]
     private async Task ClearImageCache() { Shell.Notify(Loc.T("cache_cleared", ArtworkLoader.ClearDiskCache()), ToastTone.Success); await MeasureAsync(); }

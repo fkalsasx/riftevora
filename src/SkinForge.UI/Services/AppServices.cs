@@ -16,6 +16,8 @@ public sealed class AppServices
     public required LocalPackageLibrary Library { get; init; }
     public required WorkspaceStore Store { get; init; }
     public required string DataRoot { get; init; }
+    public LtkSetupService LtkSetup { get; init; } = new();
+    public LtkGameConfiguration LtkGame { get; init; } = new();
 
     private readonly ConcurrentDictionary<string, PackageInspection> _inspections = new();
     private readonly SemaphoreSlim _packageGate = new(1, 1);

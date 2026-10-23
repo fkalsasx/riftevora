@@ -134,8 +134,9 @@ public sealed partial class CollectionPickerDialog : DialogViewModel
 
 public sealed partial class SetupDialog : DialogViewModel
 {
-    public SetupDialog(AppServices app) { App = app; }
+    public SetupDialog(AppServices app, ShellViewModel shell) { App = app; Shell = shell; }
     public AppServices App { get; }
+    public ShellViewModel Shell { get; }
     public override string Title => Loc.T("setup_title");
     public bool LtkReady => App.LtkInstalled;
     public string LtkDetail => App.LtkInstalled ? (App.LtkVersion is { Length: > 0 } v ? "v" + v + " · " : "") + App.LtkPath : Loc.T("setup_ltk_missing");
@@ -143,12 +144,14 @@ public sealed partial class SetupDialog : DialogViewModel
     public string GameDetail => App.Game?.RootDirectory ?? Loc.T("setup_game_missing");
     public Func<Task>? Recheck { get; set; }
     public Action? ChooseLtk { get; set; }
-    public Action? DownloadLtk { get; set; }
+    public Func<Task>? DownloadLtk { get; set; }
+    public Func<Task>? AddGame { get; set; }
     public Action? Done { get; set; }
     public void Refresh() { OnPropertyChanged(nameof(LtkReady)); OnPropertyChanged(nameof(LtkDetail)); OnPropertyChanged(nameof(GameReady)); OnPropertyChanged(nameof(GameDetail)); }
     [RelayCommand] private async Task RecheckAsync() { if (Recheck != null) await Recheck(); Refresh(); }
     [RelayCommand] private void ChooseLtkFile() => ChooseLtk?.Invoke();
-    [RelayCommand] private void Download() => DownloadLtk?.Invoke();
+    [RelayCommand] private async Task Download() { if (DownloadLtk != null) await DownloadLtk(); Refresh(); }
+    [RelayCommand] private async Task AddGameAsync() { if (AddGame != null) await AddGame(); Refresh(); }
     [RelayCommand] private void Finish() { Close?.Invoke(); Done?.Invoke(); }
 }
 

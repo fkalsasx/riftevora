@@ -219,13 +219,17 @@
                 </Grid>
             </Border>
             <TextBlock Text="{loc:T setup_note}" Style="{StaticResource Text.Sub}" Margin="0,8,0,0"/>
+            <TextBlock Text="{Binding Shell.SetupStatus}" Style="{StaticResource Text.Sub}" TextWrapping="Wrap" Margin="0,10,0,0" Visibility="{Binding Shell.HasSetupStatus, Converter={x:Static c:Conv.Vis}}"/>
+            <ProgressBar Value="{Binding Shell.SetupPercent}" Maximum="100" Height="4" Margin="0,10,0,0" Visibility="{Binding Shell.IsSetupBusy, Converter={x:Static c:Conv.Vis}}"/>
 
-            <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+            <WrapPanel Margin="0,22,0,0">
+                <Button Style="{StaticResource Btn.Primary}" Content="{loc:T setup_add_game}" Command="{Binding Shell.AddGameCommand}" Margin="0,0,8,8"/>
                 <Button Style="{StaticResource Btn.Secondary.Sm}" Content="{loc:T setup_recheck}" Command="{Binding RecheckCommand}" Margin="0,0,8,0"/>
                 <Button Style="{StaticResource Btn.Secondary.Sm}" Content="{loc:T setup_choose_ltk}" Command="{Binding ChooseLtkFileCommand}" Margin="0,0,8,0"/>
-                <Button Style="{StaticResource Btn.Ghost.Sm}" Content="{loc:T setup_download}" Command="{Binding DownloadCommand}"/>
+                <Button Style="{StaticResource Btn.Ghost.Sm}" Content="{loc:T setup_download}" Command="{Binding Shell.DownloadLtkCommand}"/>
+                <Button Style="{StaticResource Btn.Ghost.Sm}" Command="{Binding Shell.CancelSetupCommand}" Content="{loc:T cancel}" Visibility="{Binding Shell.SetupCanCancel, Converter={x:Static c:Conv.Vis}}"/>
                 <Button Style="{StaticResource Btn.Primary}" Content="{loc:T setup_start}" Command="{Binding FinishCommand}" HorizontalAlignment="Right" Margin="40,0,0,0"/>
-            </StackPanel>
+            </WrapPanel>
         </StackPanel>
         <DataTemplate.Triggers>
             <DataTrigger Binding="{Binding LtkReady}" Value="True">

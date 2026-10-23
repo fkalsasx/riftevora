@@ -5,7 +5,10 @@
     <TextBlock Text="{loc:T studio_eyebrow}" Foreground="{DynamicResource AccentBrush}" FontSize="10" FontWeight="SemiBold" Margin="0,0,0,20"/>
     <TextBlock Text="{loc:T studio_title}" TextWrapping="Wrap" FontFamily="{StaticResource FontDisplay}" FontSize="46" FontWeight="SemiBold" LineHeight="54" Foreground="#F3F3E9"/>
     <TextBlock Text="{loc:T studio_desc}" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="23" Margin="0,18,0,24" MaxWidth="370" HorizontalAlignment="Left"/>
-    <WrapPanel><Button Style="{StaticResource Btn.Primary}" Content="{loc:T nav_champions}" Command="{Binding Shell.NavigateCommand}" CommandParameter="champions" Margin="0,0,8,8"/><Button Style="{StaticResource Btn.Secondary}" Content="{loc:T studio_surprise}" Command="{Binding SurpriseCommand}" Margin="0,0,0,8"/></WrapPanel>
+    <WrapPanel><Button Style="{StaticResource Btn.Primary}" Content="{loc:T nav_champions}" Command="{Binding Shell.NavigateCommand}" CommandParameter="champions" Margin="0,0,8,8"/><Button Style="{StaticResource Btn.Secondary}" Content="{loc:T studio_surprise}" Command="{Binding SurpriseCommand}" Margin="0,0,8,8"/><Button Style="{StaticResource Btn.Secondary}" Content="{loc:T setup_add_game}" Command="{Binding Shell.AddGameCommand}" Margin="0,0,0,8"/></WrapPanel>
+    <TextBlock Text="{Binding Shell.SetupStatus}" Visibility="{Binding Shell.HasSetupStatus, Converter={x:Static c:Conv.Vis}}" Style="{StaticResource Text.Sub}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+    <ProgressBar Value="{Binding Shell.SetupPercent}" Maximum="100" Height="3" Margin="0,8,0,0" Visibility="{Binding Shell.IsSetupBusy, Converter={x:Static c:Conv.Vis}}"/>
+    <Button Style="{StaticResource Btn.Ghost.Sm}" Content="{loc:T cancel}" Command="{Binding Shell.CancelSetupCommand}" HorizontalAlignment="Left" Visibility="{Binding Shell.SetupCanCancel, Converter={x:Static c:Conv.Vis}}"/>
     <TextBlock Text="{loc:T app_free_caption}" Foreground="{StaticResource TextMutedBrush}" FontSize="11" Margin="0,14,0,0"/>
    </StackPanel>
    <Border Grid.Column="1" Height="390" Background="#20353B" CornerRadius="22" ClipToBounds="True">
